@@ -1,0 +1,1 @@
+# bmh-blog-generator
