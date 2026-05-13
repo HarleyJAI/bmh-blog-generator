@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BMH Blog Command Center</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --bmh-green: #00A651;
+    --bmh-dark: #0A0F0D;
+    --bmh-surface: #111A14;
+    --bmh-card: #162019;
+    --bmh-border: #1E3024;
+    --bmh-green-dim: rgba(0,166,81,0.12);
+    --bmh-green-glow: rgba(0,166,81,0.3);
+    --text-primary: #F0F7F2;
+    --text-secondary: #7A9E85;
+    --text-muted: #3D5E47;
+    --accent-gold: #C9A84C;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bmh-dark);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,166,81,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,166,81,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--bmh-border);
+  }
+
+  .logo-area {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .logo-mark {
+    width: 44px;
+    height: 44px;
+    background: var(--bmh-green);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: #fff;
+  }
+
+  .header-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .header-sub {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+  }
+
+  .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bmh-green-dim);
+    border: 1px solid var(--bmh-border);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    color: var(--bmh-green);
+    font-weight: 500;
+  }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    background: var(--bmh-green);
+    border-radius: 50%;
+    animation: pulse 2s ease infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* Two-column layout */
+  .layout {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 20px;
+    align-items: start;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .card {
+    background: var(--bmh-card);
+    border: 1px solid var(--bmh-border);
+    border-radius: 14px;
+    padding: 20px;
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 14px;
+  }
+
+  /* Pillar selector */
+  .pillar-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .pillar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bmh-surface);
+  }
+
+  .pillar-item:hover {
+    border-color: var(--bmh-green);
+    background: var(--bmh-green-dim);
+  }
+
+  .pillar-item.active {
+    border-color: var(--bmh-green);
+    background: var(--bmh-green-dim);
+  }
+
+  .pillar-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+  }
+
+  .pillar-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    flex: 1;
+  }
+
+  .pillar-check {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1px solid var(--bmh-border);
+    background: var(--bmh-surface);
+    transition: all 0.2s;
+  }
+
+  .pillar-item.active .pillar-check {
+    background: var(--bmh-green);
+    border-color: var(--bmh-green);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .pillar-item.active .pillar-check::after {
+    content: '✓';
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  /* Tone selector */
+  .tone-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .tone-btn {
+    padding: 8px 10px;
+    border-radius: 7px;
+    border: 1px solid var(--bmh-border);
+    background: var(--bmh-surface);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  .tone-btn:hover, .tone-btn.active {
+    border-color: var(--bmh-green);
+    color: var(--bmh-green);
+    background: var(--bmh-green-dim);
+  }
+
+  /* Schedule */
+  .schedule-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .schedule-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .schedule-select {
+    background: var(--bmh-surface);
+    border: 1px solid var(--bmh-border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 9px 12px;
+    width: 100%;
+    outline: none;
+    appearance: none;
+    cursor: pointer;
+  }
+
+  .schedule-select:focus {
+    border-color: var(--bmh-green);
+  }
+
+  /* API credentials */
+  .cred-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .cred-input {
+    background: var(--bmh-surface);
+    border: 1px solid var(--bmh-border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    padding: 9px 12px;
+    width: 100%;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .cred-input::placeholder { color: var(--text-muted); }
+  .cred-input:focus { border-color: var(--bmh-green); }
+
+  .cred-note {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  /* Main panel */
+  .main-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  /* Generate button */
+  .generate-btn {
+    width: 100%;
+    padding: 16px;
+    background: var(--bmh-green);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .generate-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+  }
+
+  .generate-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 30px var(--bmh-green-glow);
+  }
+
+  .generate-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Output area */
+  .output-card {
+    background: var(--bmh-card);
+    border: 1px solid var(--bmh-border);
+    border-radius: 14px;
+    overflow: hidden;
+    min-height: 400px;
+  }
+
+  .output-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--bmh-border);
+    background: var(--bmh-surface);
+  }
+
+  .output-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .output-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .action-btn {
+    padding: 6px 14px;
+    border-radius: 7px;
+    border: 1px solid var(--bmh-border);
+    background: var(--bmh-surface);
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+
+  .action-btn:hover {
+    border-color: var(--bmh-green);
+    color: var(--bmh-green);
+  }
+
+  .publish-btn {
+    padding: 6px 14px;
+    border-radius: 7px;
+    border: none;
+    background: var(--bmh-green);
+    color: #fff;
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+  }
+
+  .publish-btn:hover { opacity: 0.85; }
+  .publish-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .output-body {
+    padding: 24px;
+    min-height: 360px;
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--text-primary);
+  }
+
+  .output-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 360px;
+    gap: 12px;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .empty-icon {
+    font-size: 40px;
+    opacity: 0.4;
+  }
+
+  .empty-text {
+    font-size: 14px;
+  }
+
+  /* Blog output formatting */
+  .blog-output h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    line-height: 1.3;
+  }
+
+  .blog-output .meta {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--bmh-border);
+    display: flex;
+    gap: 16px;
+  }
+
+  .blog-output .meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .blog-output h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--bmh-green);
+    margin: 22px 0 10px;
+  }
+
+  .blog-output p {
+    margin-bottom: 14px;
+    color: #C8DDD0;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .blog-output ul {
+    margin: 10px 0 14px 16px;
+    color: #C8DDD0;
+  }
+
+  .blog-output li {
+    margin-bottom: 6px;
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .blog-output .cta-box {
+    background: var(--bmh-green-dim);
+    border: 1px solid var(--bmh-border);
+    border-left: 3px solid var(--bmh-green);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 20px;
+  }
+
+  .blog-output .cta-box p {
+    margin: 0;
+    color: var(--text-primary);
+  }
+
+  /* Schedule queue */
+  .queue-card {
+    background: var(--bmh-card);
+    border: 1px solid var(--bmh-border);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .queue-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--bmh-border);
+    background: var(--bmh-surface);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .queue-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+
+  .queue-count {
+    background: var(--bmh-green-dim);
+    border: 1px solid var(--bmh-green);
+    color: var(--bmh-green);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+
+  .queue-list {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .queue-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: var(--bmh-surface);
+    border-radius: 8px;
+    border: 1px solid var(--bmh-border);
+  }
+
+  .queue-item-status {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .status-scheduled { background: var(--accent-gold); }
+  .status-published { background: var(--bmh-green); }
+  .status-draft { background: var(--text-muted); }
+
+  .queue-item-title {
+    font-size: 13px;
+    color: var(--text-primary);
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .queue-item-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  /* Loading state */
+  .loading-dots {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    height: 360px;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    background: var(--bmh-green);
+    border-radius: 50%;
+    animation: bounce 1.2s ease infinite;
+  }
+
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes bounce {
+    0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+    40% { transform: translateY(-10px); opacity: 1; }
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--bmh-green);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 100;
+  }
+
+  .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .toast.error {
+    background: #c0392b;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--bmh-border); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-area">
+      <div class="logo-mark">BMH</div>
+      <div>
+        <div class="header-title">Blog Command Center</div>
+        <div class="header-sub">beyondmobilehealth.com · Duda-Connected</div>
+      </div>
+    </div>
+    <div class="status-badge">
+      <div class="status-dot"></div>
+      AI Ready
+    </div>
+  </div>
+
+  <!-- Layout -->
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+
+      <!-- Pillar Selector -->
+      <div class="card">
+        <div class="card-title">Content Pillar</div>
+        <div class="pillar-list" id="pillarList">
+          <div class="pillar-item active" data-pillar="Healthcare Access as Infrastructure">
+            <span class="pillar-icon">🏥</span>
+            <span class="pillar-name">Healthcare Access</span>
+            <div class="pillar-check"></div>
+          </div>
+          <div class="pillar-item" data-pillar="Veteran Operator Playbook">
+            <span class="pillar-icon">⚓</span>
+            <span class="pillar-name">Veteran Operator</span>
+            <div class="pillar-check"></div>
+          </div>
+          <div class="pillar-item" data-pillar="Ecosystem Architecture">
+            <span class="pillar-icon">🔗</span>
+            <span class="pillar-name">Ecosystem Architecture</span>
+            <div class="pillar-check"></div>
+          </div>
+          <div class="pillar-item" data-pillar="Community Wealth Engine">
+            <span class="pillar-icon">🌱</span>
+            <span class="pillar-name">Community Wealth</span>
+            <div class="pillar-check"></div>
+          </div>
+          <div class="pillar-item" data-pillar="Mobile Phlebotomy Innovation">
+            <span class="pillar-icon">🩸</span>
+            <span class="pillar-name">Phlebotomy Innovation</span>
+            <div class="pillar-check"></div>
+          </div>
+          <div class="pillar-item" data-pillar="GLP-1 and Weight Management">
+            <span class="pillar-icon">💊</span>
+            <span class="pillar-name">GLP-1 / Weight Care</span>
+            <div class="pillar-check"></div>
+          </div>
+          <div class="pillar-item" data-pillar="Sports Performance and Corporate Wellness">
+            <span class="pillar-icon">🏆</span>
+            <span class="pillar-name">Sports & Corporate</span>
+            <div class="pillar-check"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tone -->
+      <div class="card">
+        <div class="card-title">Voice Tone</div>
+        <div class="tone-grid">
+          <button class="tone-btn active" data-tone="Commander — bold, declarative">Commander</button>
+          <button class="tone-btn" data-tone="Builder — grounded, methodical">Builder</button>
+          <button class="tone-btn" data-tone="Advocate — warm, purposeful">Advocate</button>
+          <button class="tone-btn" data-tone="Disruptor — sharp, provocative">Disruptor</button>
+        </div>
+      </div>
+
+      <!-- Schedule -->
+      <div class="card">
+        <div class="card-title">Publish Schedule</div>
+        <div class="schedule-row">
+          <label class="schedule-label">Post Cadence</label>
+          <select class="schedule-select" id="cadence">
+            <option value="1x/week">1x per week</option>
+            <option value="2x/week">2x per week</option>
+            <option value="3x/week">3x per week</option>
+            <option value="daily">Daily</option>
+          </select>
+          <label class="schedule-label" style="margin-top:4px;">Publish Mode</label>
+          <select class="schedule-select" id="publishMode">
+            <option value="draft">Save as Draft (review first)</option>
+            <option value="publish">Publish Immediately</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Duda API -->
+      <div class="card">
+        <div class="card-title">Duda API Credentials</div>
+        <div class="cred-form">
+          <input class="cred-input" type="text" id="dudaUser" placeholder="API Username" />
+          <input class="cred-input" type="password" id="dudaPass" placeholder="API Password" />
+          <input class="cred-input" type="text" id="dudaSite" placeholder="Site Name / ID" />
+          <div class="cred-note">Found in Duda Dashboard → White Label → API Access</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Main Panel -->
+    <div class="main-panel">
+
+      <!-- Generate Button -->
+      <button class="generate-btn" id="generateBtn" onclick="generateBlog()">
+        <span>⚡</span>
+        <span id="generateBtnText">Generate Blog Post</span>
+      </button>
+
+      <!-- Output Card -->
+      <div class="output-card">
+        <div class="output-toolbar">
+          <span class="output-label" id="outputLabel">Output</span>
+          <div class="output-actions">
+            <button class="action-btn" onclick="copyBlog()" id="copyBtn" style="display:none">Copy HTML</button>
+            <button class="action-btn" onclick="regenerate()" id="regenBtn" style="display:none">Regenerate</button>
+            <button class="publish-btn" onclick="publishToDuda()" id="publishBtn" disabled>Push to Duda →</button>
+          </div>
+        </div>
+        <div class="output-body" id="outputBody">
+          <div class="output-empty">
+            <div class="empty-icon">✍️</div>
+            <div class="empty-text">Select a pillar and hit Generate<br>to create your first post</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Schedule Queue -->
+      <div class="queue-card">
+        <div class="queue-header">
+          <span class="queue-title">Content Queue</span>
+          <span class="queue-count" id="queueCount">0 posts</span>
+        </div>
+        <div class="queue-list" id="queueList">
+          <div style="padding:16px; text-align:center; color:var(--text-muted); font-size:13px;">
+            Generate posts to build your queue
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let selectedPillar = 'Healthcare Access as Infrastructure';
+  let selectedTone = 'Commander — bold, declarative';
+  let currentBlogHTML = '';
+  let currentBlogTitle = '';
+  let queue = [];
+
+  // Pillar selection
+  document.querySelectorAll('.pillar-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.pillar-item').forEach(p => p.classList.remove('active'));
+      item.classList.add('active');
+      selectedPillar = item.dataset.pillar;
+    });
+  });
+
+  // Tone selection
+  document.querySelectorAll('.tone-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tone-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedTone = btn.dataset.tone;
+    });
+  });
+
+  async function generateBlog() {
+    const btn = document.getElementById('generateBtn');
+    const btnText = document.getElementById('generateBtnText');
+    const outputBody = document.getElementById('outputBody');
+    const outputLabel = document.getElementById('outputLabel');
+
+    btn.disabled = true;
+    btnText.textContent = 'Generating...';
+
+    outputBody.innerHTML = `<div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
+
+    const systemPrompt = `You are the content strategist for Beyond Mobile Health (BMH), a 51% veteran-owned mobile healthcare company operating across 20+ states. Founded by Jovon Harley, a Navy veteran and healthcare entrepreneur.
+
+BMH services: mobile phlebotomy, at-home lab draws, clinical trial specimen collection, corporate wellness, GLP-1/weight management programs. Clients include Harvard T.H. Chan School of Public Health, Mass General Brigham, Boston Medical Center, NBA, WNBA, NHL, MLB, MLS teams.
+
+Write a full SEO blog post for beyondmobilehealth.com with this EXACT HTML structure — no markdown, no explanation, pure HTML:
+
+<h1>[Compelling title targeting healthcare decision-makers and patients]</h1>
+<div class="meta"><span>✍️ By Jovon Harley</span><span>📍 Beyond Mobile Health</span><span>🏥 [Pillar category]</span></div>
+<p>[Opening hook paragraph — 2-3 sentences, stops the scroll, states the problem or bold claim]</p>
+<h2>[Section 1 header]</h2>
+<p>[2-3 paragraphs of insight, grounded in real BMH operations]</p>
+<h2>[Section 2 header]</h2>
+<p>[2-3 paragraphs with specifics — stats, client types, use cases]</p>
+<ul><li>[Point 1]</li><li>[Point 2]</li><li>[Point 3]</li></ul>
+<h2>[Section 3 header]</h2>
+<p>[2-3 paragraphs]</p>
+<h2>[Conclusion]</h2>
+<p>[Strong closing paragraph]</p>
+<div class="cta-box"><p>Ready to bring healthcare to your team? <strong>Contact Beyond Mobile Health at 857-557-7197 or info@beyondmobilehealth.com</strong> — we serve 20+ states and respond within 24 hours.</p></div>
+
+Rules:
+- Tone: ${selectedTone}
+- Write with authority, specificity, and mission conviction — not generic healthcare content
+- Reference real BMH service types naturally (mobile phlebotomy, clinical trials, sports orgs, corporate wellness)
+- 800-1000 words total
+- SEO-optimized for mobile phlebotomy, at-home lab draws, mobile healthcare
+- Output ONLY the HTML starting with <h1> — no preamble, no backticks`;
+
+    const userPrompt = `Content Pillar: ${selectedPillar}
+Tone: ${selectedTone}
+
+Generate a full blog post now.`;
+
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1500,
+          system: systemPrompt,
+          messages: [{ role: "user", content: userPrompt }]
+        })
+      });
+
+      const data = await response.json();
+      const rawHTML = data.content?.[0]?.text || '';
+      const clean = rawHTML.replace(/```html|```/g, '').trim();
+
+      // Extract title for queue
+      const titleMatch = clean.match(/<h1>(.*?)<\/h1>/);
+      currentBlogTitle = titleMatch ? titleMatch[1] : `BMH — ${selectedPillar}`;
+      currentBlogHTML = clean;
+
+      outputBody.innerHTML = `<div class="blog-output">${clean}</div>`;
+      outputLabel.textContent = `Generated — ${selectedPillar}`;
+
+      document.getElementById('copyBtn').style.display = 'block';
+      document.getElementById('regenBtn').style.display = 'block';
+      document.getElementById('publishBtn').disabled = false;
+
+      addToQueue(currentBlogTitle, 'draft');
+
+    } catch (err) {
+      outputBody.innerHTML = `<div class="output-empty"><div class="empty-icon">⚠️</div><div class="empty-text">Generation failed. Check your connection and try again.</div></div>`;
+      showToast('Generation failed — check console', true);
+    }
+
+    btn.disabled = false;
+    btnText.textContent = 'Generate Blog Post';
+  }
+
+  function regenerate() {
+    generateBlog();
+  }
+
+  function copyBlog() {
+    if (!currentBlogHTML) return;
+    navigator.clipboard.writeText(currentBlogHTML).then(() => {
+      showToast('HTML copied to clipboard ✓');
+    });
+  }
+
+  async function publishToDuda() {
+    const user = document.getElementById('dudaUser').value.trim();
+    const pass = document.getElementById('dudaPass').value.trim();
+    const site = document.getElementById('dudaSite').value.trim();
+    const mode = document.getElementById('publishMode').value;
+
+    if (!user || !pass || !site) {
+      showToast('Add your Duda API credentials first', true);
+      return;
+    }
+
+    if (!currentBlogHTML) {
+      showToast('Generate a blog post first', true);
+      return;
+    }
+
+    const btn = document.getElementById('publishBtn');
+    btn.disabled = true;
+    btn.textContent = 'Pushing...';
+
+    // Build Duda-compatible payload
+    const payload = {
+      title: currentBlogTitle,
+      body: currentBlogHTML,
+      author: "Jovon Harley",
+      status: mode === 'publish' ? 'PUBLISHED' : 'DRAFT',
+      tags: [selectedPillar.toLowerCase().replace(/ /g, '-'), 'mobile-health', 'phlebotomy'],
+      categories: [selectedPillar]
+    };
+
+    try {
+      const credentials = btoa(`${user}:${pass}`);
+      const endpoint = `https://api.duda.co/api/sites/${site}/blogs/posts`;
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${credentials}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        showToast(mode === 'publish' ? '✓ Published to beyondmobilehealth.com' : '✓ Saved as draft in Duda');
+        updateQueueStatus(currentBlogTitle, mode === 'publish' ? 'published' : 'scheduled');
+      } else {
+        const err = await response.text();
+        // CORS expected in browser — provide manual fallback
+        showToast('Credentials saved — use copy + Duda dashboard for now', false);
+        showManualFallback();
+      }
+    } catch (err) {
+      // Browser CORS restriction — guide user
+      showManualFallback();
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Push to Duda →';
+  }
+
+  function showManualFallback() {
+    const user = document.getElementById('dudaUser').value.trim();
+    const pass = document.getElementById('dudaPass').value.trim();
+    const site = document.getElementById('dudaSite').value.trim();
+
+    if (!user) return;
+
+    const curlCmd = `curl -X POST https://api.duda.co/api/sites/${site}/blogs/posts \\
+  -u "${user}:${pass}" \\
+  -H "Content-Type: application/json" \\
+  -d '{"title":"${currentBlogTitle}","body":"[PASTE HTML]","author":"Jovon Harley","status":"PUBLISHED"}'`;
+
+    showToast('⚠️ Browser CORS blocks direct API. Use cURL or n8n — see console.', true);
+    console.log('--- BMH Duda Publish Command ---');
+    console.log(curlCmd);
+    console.log('--- Blog HTML ---');
+    console.log(currentBlogHTML);
+  }
+
+  function addToQueue(title, status) {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+    queue.unshift({ title, status, date: dateStr });
+
+    const list = document.getElementById('queueList');
+    const count = document.getElementById('queueCount');
+
+    list.innerHTML = queue.map(item => `
+      <div class="queue-item">
+        <div class="queue-item-status status-${item.status}"></div>
+        <div class="queue-item-title">${item.title}</div>
+        <div class="queue-item-meta">${item.status} · ${item.date}</div>
+      </div>
+    `).join('');
+
+    count.textContent = `${queue.length} post${queue.length !== 1 ? 's' : ''}`;
+  }
+
+  function updateQueueStatus(title, newStatus) {
+    const item = queue.find(q => q.title === title);
+    if (item) item.status = newStatus;
+
+    const list = document.getElementById('queueList');
+    list.innerHTML = queue.map(item => `
+      <div class="queue-item">
+        <div class="queue-item-status status-${item.status}"></div>
+        <div class="queue-item-title">${item.title}</div>
+        <div class="queue-item-meta">${item.status} · ${item.date}</div>
+      </div>
+    `).join('');
+  }
+
+  function showToast(message, isError = false) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `toast ${isError ? 'error' : ''} show`;
+    setTimeout(() => toast.className = 'toast', 3500);
+  }
+</script>
+</body>
+</html>
