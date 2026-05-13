@@ -755,6 +755,15 @@
         </div>
       </div>
 
+      <!-- Anthropic API Key -->
+      <div class="card">
+        <div class="card-title">Anthropic API Key</div>
+        <div class="cred-form">
+          <input class="cred-input" type="password" id="anthropicKey" placeholder="sk-ant-..." />
+          <div class="cred-note">Get yours at console.anthropic.com → API Keys</div>
+        </div>
+      </div>
+
     </div>
 
     <!-- Main Panel -->
@@ -872,10 +881,23 @@ Tone: ${selectedTone}
 
 Generate a full blog post now.`;
 
+    const apiKey = document.getElementById('anthropicKey').value.trim();
+    if (!apiKey) {
+      outputBody.innerHTML = `<div class="output-empty"><div class="empty-icon">🔑</div><div class="empty-text">Add your Anthropic API key<br>in the sidebar to generate posts</div></div>`;
+      btn.disabled = false;
+      btnText.textContent = 'Generate Blog Post';
+      return;
+    }
+
     try {
       const response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-direct-browser-access": "true"
+        },
         body: JSON.stringify({
           model: "claude-sonnet-4-20250514",
           max_tokens: 1500,
